@@ -27,10 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->cron      = 0;
 $plugin->component = 'qtype_speakautograde';
+$plugin->dependencies = array('qtype_essayautograde' => ANY_VERSION);
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2015111600; // Moodle 3.0
 $plugin->version   = 2019030966;
-$plugin->release   = '2019-03-10 (00)';
+$plugin->release   = '2019-03-11 (01)';
 
 // https://docs.moodle.org/dev/Releases
 // Moodle 3.6 2018120300  3 Dec 2018

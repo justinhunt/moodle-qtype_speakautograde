@@ -53,6 +53,9 @@ if ($version = optional_param('version', 0, PARAM_INT)) {
         $dd = $match[3];
         $vv = intval($match[4]);
         $text = date($dateformat, mktime(0,0,0,$mm,$dd,$yy)).($vv==0 ? '' : " ($vv)");
+    } else if ($version < 0) {
+        $text = 'Moodle 2.0 (24 Nov 2010)';
+        $version = '2010112400';
     } else {
         $text = ''; // shouldn't happen !!
     }
@@ -79,6 +82,7 @@ if ($version = optional_param('version', 0, PARAM_INT)) {
     echo html_writer::start_tag('div');
 
     // extract and format versions from Reader upgrade script
+    $versions = array();
     $contents = file_get_contents($CFG->dirroot.'/question/type/speakautograde/db/upgrade.php');
     preg_match_all('/(?<=\$newversion = )(\d{4})(\d{2})(\d{2})(\d{2})(?=;)/', $contents, $matches);
     $i_max = count($matches[0]);
@@ -90,7 +94,12 @@ if ($version = optional_param('version', 0, PARAM_INT)) {
         $vv = intval($matches[4][$i]);
         $versions[$version] = date($dateformat, mktime(0,0,0,$mm,$dd,$yy)).($vv==0 ? '' : " ($vv)");
     }
-    krsort($versions);
+    
+    if (empty($versions)) {
+        $versions[-1] = get_string('forceupgrade', 'qtype_essayautograde');
+    } else {
+        krsort($versions);
+    }
 
     // add form elements
     echo get_string('version').' '.html_writer::select($versions, 'version').' ';
