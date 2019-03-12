@@ -46,7 +46,7 @@ $expiredays = utils::get_expiredays_options();
 $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/expiredays', get_string('expiredays', constants::M_COMPONENT), '', '365', $expiredays));
 
 $langoptions = utils::get_lang_options();
-$settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/language', get_string('ttslanguage', constants::M_COMPONENT), '', 'en-US', $langoptions));
+$settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/language', get_string('language', constants::M_COMPONENT), '', 'en-US', $langoptions));
 
 
 
@@ -64,8 +64,8 @@ $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/language
     //transcriber options
     $transcriber_options = utils::fetch_options_transcribers();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/transcriber',
-        new lang_string('videorecorderskin', constants::M_COMPONENT),
-        new lang_string('videorecorderskin', constants::M_COMPONENT), constants::TRANSCRIBER_CHROME, $transcriber_options));
+        new lang_string('transcriber', constants::M_COMPONENT),
+        new lang_string('transcriber', constants::M_COMPONENT), constants::TRANSCRIBER_CHROME, $transcriber_options));
 
     //Transcode audio/video
     $yesno_options = array( 0 => get_string("no", constants::M_COMPONENT),
