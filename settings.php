@@ -65,14 +65,14 @@ $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/language
     $transcriber_options = utils::fetch_options_transcribers();
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/transcriber',
         new lang_string('transcriber', constants::M_COMPONENT),
-        new lang_string('transcriber', constants::M_COMPONENT), constants::TRANSCRIBER_CHROME, $transcriber_options));
+        new lang_string('transcriber_details', constants::M_COMPONENT), constants::TRANSCRIBER_CHROME, $transcriber_options));
 
     //Transcode audio/video
     $yesno_options = array( 0 => get_string("no", constants::M_COMPONENT),
         1 => get_string("yes", constants::M_COMPONENT));
     $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/transcode',
         new lang_string('transcode', constants::M_COMPONENT),
-        new lang_string('transcodedetails', constants::M_COMPONENT), 1, $yesno_options));
+        new lang_string('transcode_details', constants::M_COMPONENT), 1, $yesno_options));
 
 //Default html5 fallback
     $fallback_options = utils::fetch_options_fallback();
