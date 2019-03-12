@@ -37,18 +37,45 @@ class qtype_speakautograde extends qtype_essayautograde {
 
     public function extra_question_fields() {
         $fields = parent::extra_question_fields();
-        //
+
         // add Poodll fields here
-        //
+        $fields[]='audioskin';
+        $fields[]='videoskin';
+        $fields[]='timelimit';
+        $fields[]='expiredays';
+        $fields[]='language';
+        $fields[]='transcode';
+        $fields[]='transcriber';
+
         return $fields;
     }
 
     public function save_question_options($formdata) {
+        global $DB;
         parent::save_question_options($formdata);
-        //
+
         // save Poodll options here
-        //
-        return true;
+        $questionid = $formdata->id;
+        $plugin = $this->plugin_name();
+        $optionstable = $plugin.'_options';
+        $params = array('questionid' => $questionid);
+        $optionsid = $DB->get_field($optionstable, 'id', $params);
+
+        //save options
+        $update= new stdClass();
+        $update->id=$optionsid;
+        $update->audioskin=$formdata->audioskin;
+        $update->videoskin=$formdata->videoskin;
+        $update->timelimit=$formdata->timelimit;
+        $update->expiredays=$formdata->expiredays;
+        $update->language=$formdata->language;
+        $update->transcode=$formdata->transcode;
+        $update->transcriber=$formdata->transcriber;
+        $ret = $DB->update_record($optionstable,$update);
+
+
+
+        return $ret;
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
@@ -63,6 +90,15 @@ class qtype_speakautograde extends qtype_essayautograde {
         // Delete Poodll stuff here
         //
         parent::delete_question($questionid, $contextid);
+    }
+
+    public function response_formats() {
+        $plugin = 'qtype_speakautograde';
+       // $formats = parent::response_formats();
+        $formats=array();
+        $formats['audio']=get_string('formataudio',$plugin);
+        $formats['video']=get_string('formatvideo',$plugin);
+        return $formats;
     }
 
     /**

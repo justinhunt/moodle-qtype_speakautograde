@@ -43,9 +43,49 @@ require_once($CFG->dirroot.'/question/type/essayautograde/question.php');
 // class:     question_graded_automatically
 class qtype_speakautograde_question extends qtype_essayautograde_question {
     public function update_current_response($response, $displayoptions=null) {
-        parent::update_current_response($response, $displayoptions);
+
         //
         // update Poodll response here
         //
+        if (!empty($response) && !empty($response['answeraudiourl'])) {
+            $this->save_current_response('answeraudiourl', $response['answeraudiourl']);
+        }
+        if (!empty($response) && !empty($response['answertranscript'])) {
+            $this->save_current_response('answertranscript', $response['answertranscript']);
+        }
+
+        parent::update_current_response($response, $displayoptions);
+
+    }
+    public function get_expected_data() {
+        $expecteddata= parent::get_expected_data();
+        $expecteddata['answertranscript'] = PARAM_RAW;
+        $expecteddata['answeraudiourl'] = PARAM_URL;
+        return $expecteddata;
+    }
+    public function is_complete_response(array $response) {
+        // Determine if the given response has an audiourl
+        //TO DO add check for transcripts here
+        $hasaudio = array_key_exists('answeraudiourl', $response) && ($response['answeraudiourl'] !== '');
+
+        // The response is complete iff all of our requirements are met.
+        return $hasaudio;
+    }
+
+    //register an adhoc task to pick up transcripts
+    public function register_fetch_transcript_task($audiourl, $qa){
+        $fetch_task = new \qtype_speakautograde\task\fetch_transcript_adhoc();
+        $fetch_task->set_component('qtype_speakautograde');
+
+        $customdata = new \stdClass();
+        $customdata->audiourl = $audiourl;
+        $customdata->qa = $qa;
+        $customdata->question = $this;
+        $customdata->taskcreationtime = time();
+
+        $fetch_task->set_custom_data($customdata);
+        // queue it
+        \core\task\manager::queue_adhoc_task($fetch_task);
+        return true;
     }
 }

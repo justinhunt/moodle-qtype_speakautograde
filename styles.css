@@ -172,3 +172,19 @@ table.speakautograde.review .present {
     border-color:      #99ff66; /* gentle green */
     color:             #009900; /* dark green */
 }
+.qtype_speakautograde_recording_cont {
+    display: block;
+    margin: auto;
+    text-align: center;
+    width: 100%;
+    background-image: url([[pix:qtype_speakautograde|loader]]);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.qtype_speakautograde_transcriptdiv {
+    background-color: #dff4d8; /* light green */
+    border: solid 1px #CCCCCC;
+    padding: 5px;
+    max-width: 500px;
+}
