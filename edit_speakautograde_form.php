@@ -113,6 +113,15 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $question = parent::data_preprocessing($question);
 
         // process fields for Poodll plyer
+        /*
+        $question->timelimit = $question->options->timelimit;
+        $question->language = $question->options->language;
+        $question->audioskin = $question->options->audioskin;
+        $question->videoskin = $question->options->videoskin;
+        $question->transcriber = $question->options->transcriber;
+        $question->transcode = $question->options->transcode;
+        $question->expiredays = $question->options->expiredays;
+        */
 
         return $question;
     }
