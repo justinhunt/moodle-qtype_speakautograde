@@ -57,8 +57,8 @@ define(['jquery','core/log','qtype_speakautograde/cloudpoodllloader'], function(
         },
 
         register_events: function(){
-            var that =this;
             /*
+            var that =this;
             this.controls.deletebutton.click(function(){
                 if(that.controls.updatecontrol){
                     if(confirm(M.util.get_string('reallydeletesubmission',that.component))){
