@@ -39,6 +39,14 @@ function xmldb_qtype_speakautograde_upgrade($oldversion) {
     $plugin = $plugintype.'_'.$pluginname;
     $pluginoptionstable = $plugin.'_options';
 
+    $newversion = 2019032302;
+    if ($oldversion < $newversion) {
+        // Add fields for Poodll recording.
+        $fieldnames = 'timelimit, language, expiredays, transcode, transcriber, audioskin, videoskin';
+        xmldb_qtype_speakautograde_addfields($dbman, $pluginoptionstable, $fieldnames);
+        upgrade_plugin_savepoint(true, $newversion, $plugintype, $pluginname);
+    }
+
     return true;
 }
 
@@ -79,8 +87,18 @@ function xmldb_qtype_speakautograde_addfields($dbman, $pluginoptionstable, $fiel
         new xmldb_field('showgradebands',                 XMLDB_TYPE_INTEGER,  2, null, XMLDB_NOTNULL, null, 0),
         new xmldb_field('addpartialgrades',               XMLDB_TYPE_INTEGER,  2, null, XMLDB_NOTNULL, null, 0),
         new xmldb_field('showtargetphrases',              XMLDB_TYPE_INTEGER,  2, null, XMLDB_NOTNULL, null, 0),
+        // Common errors
         new xmldb_field('errorcmid',                      XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0),
         new xmldb_field('errorpercent',                   XMLDB_TYPE_INTEGER,  6, null, XMLDB_NOTNULL, null, 0),
+        // Poodll recording
+        new xmldb_field('timelimit',                      XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0),
+        new xmldb_field('language',                       XMLDB_TYPE_CHAR,   255, null, XMLDB_NOTNULL),
+        new xmldb_field('expiredays',                     XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, 0),
+        new xmldb_field('transcode',                      XMLDB_TYPE_INTEGER,  2, null, XMLDB_NOTNULL, null, 0),
+        new xmldb_field('transcriber',                    XMLDB_TYPE_CHAR,   255, null, XMLDB_NOTNULL),
+        new xmldb_field('audioskin',                      XMLDB_TYPE_CHAR,   255, null, XMLDB_NOTNULL),
+        new xmldb_field('videoskin',                      XMLDB_TYPE_CHAR,   255, null, XMLDB_NOTNULL),
+        // Standard feedback
         new xmldb_field('correctfeedback',                XMLDB_TYPE_TEXT),
         new xmldb_field('correctfeedbackformat',          XMLDB_TYPE_INTEGER,  2, null, XMLDB_NOTNULL, null, 0),
         new xmldb_field('incorrectfeedback',              XMLDB_TYPE_TEXT),

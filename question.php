@@ -42,8 +42,8 @@ require_once($CFG->dirroot.'/question/type/essayautograde/question.php');
 // interface: question_automatically_gradable
 // class:     question_graded_automatically
 class qtype_speakautograde_question extends qtype_essayautograde_question {
-    public function update_current_response($response, $displayoptions=null) {
 
+    public function update_current_response($response, $displayoptions=null) {
         //
         // update Poodll response here
         //
@@ -57,22 +57,24 @@ class qtype_speakautograde_question extends qtype_essayautograde_question {
         parent::update_current_response($response, $displayoptions);
 
     }
+
     public function get_expected_data() {
         $expecteddata= parent::get_expected_data();
         $expecteddata['answertranscript'] = PARAM_RAW;
         $expecteddata['answeraudiourl'] = PARAM_URL;
         return $expecteddata;
     }
+
     public function is_complete_response(array $response) {
         // Determine if the given response has an audiourl
-        //TO DO add check for transcripts here
+        // TODO add check for transcripts here
         $hasaudio = array_key_exists('answeraudiourl', $response) && ($response['answeraudiourl'] !== '');
 
         // The response is complete iff all of our requirements are met.
         return $hasaudio;
     }
 
-    //register an adhoc task to pick up transcripts
+    // register an adhoc task to pick up transcripts
     public function register_fetch_transcript_task($audiourl, $qa){
         $fetch_task = new \qtype_speakautograde\task\fetch_transcript_adhoc();
         $fetch_task->set_component('qtype_speakautograde');

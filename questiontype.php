@@ -38,15 +38,10 @@ class qtype_speakautograde extends qtype_essayautograde {
     public function extra_question_fields() {
         $fields = parent::extra_question_fields();
 
-        // add Poodll fields here
-        $fields[]='audioskin';
-        $fields[]='videoskin';
-        $fields[]='timelimit';
-        $fields[]='expiredays';
-        $fields[]='language';
-        $fields[]='transcode';
-        $fields[]='transcriber';
-
+        // add Poodll fields
+        array_push($fields, 'timelimit', 'language', 'expiredays',
+                            'transcriber', 'transcode',
+                            'audioskin', 'videoskin');
         return $fields;
     }
 
@@ -54,28 +49,22 @@ class qtype_speakautograde extends qtype_essayautograde {
         global $DB;
         parent::save_question_options($formdata);
 
-        // save Poodll options here
-        $questionid = $formdata->id;
+        // save Poodll options
         $plugin = $this->plugin_name();
         $optionstable = $plugin.'_options';
-        $params = array('questionid' => $questionid);
-        $optionsid = $DB->get_field($optionstable, 'id', $params);
 
-        //save options
-        $update= new stdClass();
-        $update->id=$optionsid;
-        $update->audioskin=$formdata->audioskin;
-        $update->videoskin=$formdata->videoskin;
-        $update->timelimit=$formdata->timelimit;
-        $update->expiredays=$formdata->expiredays;
-        $update->language=$formdata->language;
-        $update->transcode=$formdata->transcode;
-        $update->transcriber=$formdata->transcriber;
-        $ret = $DB->update_record($optionstable,$update);
-
-
-
-        return $ret;
+        if ($options = $DB->get_record($optionstable, array('questionid' => $formdata->id))) {
+            $options->timelimit = $formdata->timelimit;
+            $options->language = $formdata->language;
+            $options->expiredays = $formdata->expiredays;
+            $options->transcode = $formdata->transcode;
+            $options->transcriber = $formdata->transcriber;
+            $options->audioskin = $formdata->audioskin;
+            $options->videoskin = $formdata->videoskin;
+            return $DB->update_record($optionstable, $options);
+        } else {
+            return false; // no options - shouldn't happen !!
+        }
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata) {
@@ -94,11 +83,10 @@ class qtype_speakautograde extends qtype_essayautograde {
 
     public function response_formats() {
         $plugin = 'qtype_speakautograde';
-       // $formats = parent::response_formats();
-        $formats=array();
-        $formats['audio']=get_string('formataudio',$plugin);
-        $formats['video']=get_string('formatvideo',$plugin);
-        return $formats;
+        return array(
+            'audio' => get_string('formataudio', $plugin),
+            'video' => get_string('formatvideo', $plugin),
+        );
     }
 
     /**
@@ -118,10 +106,16 @@ class qtype_speakautograde extends qtype_essayautograde {
      * @return array of default values for a new question
      */
     static public function get_default_values($questionid=0, $feedback=false) {    
-        $values = parent::get_default_values($questionid=0, $feedback=false);
-        //
-        // Add Poodll values here
-        //
+        $values = parent::get_default_values($questionid, $feedback);
+        $values = array_merge($values, array(
+            'timelimit'   =>  0,
+            'language'    => '',
+            'expiredays'  =>  0,
+            'transcode'   =>  0,
+            'transcriber' => '',
+            'audioskin'   => '',
+            'videoskin'   => ''
+        ));
         return $values;
     }
 }

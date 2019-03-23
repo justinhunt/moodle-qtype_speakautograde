@@ -22,62 +22,78 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
 use qtype_speakautograde\cloudpoodll\constants;
 use qtype_speakautograde\cloudpoodll\utils;
 
-defined('MOODLE_INTERNAL') || die();
-
 if ($ADMIN->fulltree) {
+    $plugin = constants::M_COMPONENT;
 
-$settings->add(new admin_setting_configtext(constants::M_COMPONENT .'/apiuser',
-    get_string('apiuser', constants::M_COMPONENT), get_string('apiuser_details', constants::M_COMPONENT), '', PARAM_TEXT));
+    $name = 'apiuser';
+    $label = get_string($name, $plugin);
+    $details = get_string('apiuser_details', $plugin);
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $details, '', PARAM_TEXT));
 
-$tokeninfo =   utils::fetch_token_for_display(get_config(constants::M_COMPONENT,'apiuser'),get_config(constants::M_COMPONENT,'apisecret'));
-//get_string('apisecret_details', constants::M_COMPONENT)
-$settings->add(new admin_setting_configtext(constants::M_COMPONENT .'/apisecret',
-    get_string('apisecret', constants::M_COMPONENT), $tokeninfo, '', PARAM_TEXT));
+    $name = 'apisecret';
+    $label = get_string($name, $plugin);
+    $details = utils::fetch_token_for_display(get_config($plugin, 'apiuser'), get_config($plugin, 'apisecret'));
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $details, '', PARAM_TEXT));
 
-$regions = utils::get_region_options();
-$settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/awsregion', get_string('awsregion', constants::M_COMPONENT),
-    '', constants::REGION_USEAST1, $regions));
+    $name = 'awsregion';
+    $label = get_string($name, $plugin);
+    $default = constants::REGION_USEAST1;
+    $options = utils::get_region_options();
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, '', $default, $options));
 
-$expiredays = utils::get_expiredays_options();
-$settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/expiredays', get_string('expiredays', constants::M_COMPONENT), '', '365', $expiredays));
+    $name = 'expiredays';
+    $label = get_string('expiredays', $plugin);
+    $default = '365';
+    $options = utils::get_expiredays_options();
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, '', $default, $options));
 
-$langoptions = utils::get_lang_options();
-$settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/language', get_string('language', constants::M_COMPONENT), '', 'en-US', $langoptions));
+    $name = 'language';
+    $label = get_string($name, $plugin);
+    $default = 'en-US';
+    $options = utils::get_lang_options();
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, '', $default, $options));
 
+    // Audio record skin
+    $name = 'audioskin';
+    $label = get_string($name, $plugin);
+    $details = get_string($name, $plugin);
+    $default = constants::SKIN_123;
+    $options = utils::fetch_options_skins(constants::REC_AUDIO);
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, $details, $default, $options));
 
+    // Video record skin
+    $name = 'videoskin';
+    $label = get_string($name, $plugin);
+    $details = get_string($name, $plugin);
+    $options = utils::fetch_options_skins(constants::REC_VIDEO);
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label,
+        $details, constants::SKIN_123, $options));
 
-    //Default recorder skins
-    $skin_options = utils::fetch_options_skins(constants::REC_AUDIO);
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/audioskin',
-        new lang_string('audioskin', constants::M_COMPONENT),
-        new lang_string('audioskin', constants::M_COMPONENT), constants::SKIN_123, $skin_options));
+    // Transcriber options
+    $name = 'transcriber';
+    $label = get_string($name, $plugin);
+    $details = get_string($name.'_details', $plugin);
+    $default = constants::TRANSCRIBER_CHROME;
+    $options = utils::fetch_options_transcribers();
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, $details, $default, $options));
 
-    $skin_options = utils::fetch_options_skins(constants::REC_VIDEO);
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/videoskin',
-        new lang_string('videoskin', constants::M_COMPONENT),
-        new lang_string('videoskin', constants::M_COMPONENT), constants::SKIN_123, $skin_options));
+    // Transcode audio/video
+    $name = 'transcode';
+    $label = get_string($name, $plugin);
+    $details = get_string($name.'_details', $plugin);
+    $options = array( 0 => get_string('no'), 1 => get_string('yes'));
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, $details, 1, $options));
 
-    //transcriber options
-    $transcriber_options = utils::fetch_options_transcribers();
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/transcriber',
-        new lang_string('transcriber', constants::M_COMPONENT),
-        new lang_string('transcriber_details', constants::M_COMPONENT), constants::TRANSCRIBER_CHROME, $transcriber_options));
-
-    //Transcode audio/video
-    $yesno_options = array( 0 => get_string("no", constants::M_COMPONENT),
-        1 => get_string("yes", constants::M_COMPONENT));
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/transcode',
-        new lang_string('transcode', constants::M_COMPONENT),
-        new lang_string('transcode_details', constants::M_COMPONENT), 1, $yesno_options));
-
-//Default html5 fallback
-    $fallback_options = utils::fetch_options_fallback();
-    $settings->add(new admin_setting_configselect(constants::M_COMPONENT .'/fallback',
-        new lang_string('fallback', constants::M_COMPONENT),
-        new lang_string('fallbackdetails', constants::M_COMPONENT), constants::FALLBACK_IOSUPLOAD, $fallback_options));
-
+    // Default html5 fallback
+    $name = 'fallback';
+    $label = get_string($name, $plugin);
+    $details = get_string($name.'_details', $plugin);
+    $default = constants::FALLBACK_IOSUPLOAD;
+    $options = utils::fetch_options_fallback();
+    $settings->add(new admin_setting_configselect("$plugin/$name", $label, $details, $default, $options));
 }

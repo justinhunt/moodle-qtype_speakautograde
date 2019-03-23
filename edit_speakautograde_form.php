@@ -49,64 +49,82 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         parent::definition_inner($mform);
 
         $plugin = "qtype_speakautograde";
+        $config = get_config($plugin);
         $qtype = question_bank::get_qtype('speakautograde');
 
-        // add audio and video options to the response options
-        if ($mform->elementExists('responseformat')) {
-            $mform->removeElement('responseformat', false);
+        // replace response format with Poodll options (audio and video)
+        $name = 'responseformat';
+        if ($mform->elementExists($name)) {
+            $mform->removeElement($name, false);
         }
-        $responseformat = $mform->createElement('select', 'responseformat',
-            get_string('responseformat', 'qtype_essay'), $qtype->response_formats());
-        $mform->insertElementBefore($responseformat,'responsetemplateheader');
-        $mform->setDefault('responseformat', 'audio');
+        $label = get_string($name, 'qtype_essay');
+        $options = $qtype->response_formats();
+        $element = $mform->createElement('select', $name, $label, $options);
+        $mform->insertElementBefore($element, 'responsetemplateheader');
+        $mform->setDefault($name, key($options));
 
         ////////////////////////////////////////////////
         /// CLOUD POODLL API
         /////////////////////////////////////////////////
+
+        // the name of the element before which we want to insert all the recording options
+        $before = 'multitriesheader';
+
         $name = 'recordingheader';
         $label = get_string($name, $plugin);
-        $mform->addElement('header', $name, $label);
+        $mform->insertElementBefore($mform->createElement('header', $name, $label), $before);
         $mform->setExpanded($name, true);
 
-        $plugin = 'qtype_speakautograde';
-        $config = get_config($plugin);
-
         //timelimit
-        $timelimitoptions = \qtype_speakautograde\cloudpoodll\utils::get_timelimit_options();
-        $mform->addElement('select', 'timelimit', get_string('timelimit', $plugin),
-            $timelimitoptions);
-        $mform->setDefault('timelimit',60);
+        $name = 'timelimit';
+        $label = get_string($name, $plugin);
+        $options = \qtype_speakautograde\cloudpoodll\utils::get_timelimit_options();
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault($name, 60);
 
         //language options
-        $langoptions = \qtype_speakautograde\cloudpoodll\utils::get_lang_options();
-        $mform->addElement('select', 'language', get_string('language', $plugin), $langoptions);
-        $mform->setDefault('language',$config->language);
+        $name = 'language';
+        $label = get_string($name, $plugin);
+        $options = \qtype_speakautograde\cloudpoodll\utils::get_lang_options();
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault($name, $config->$name);
 
         //audioskin
-        $skinoptions = \qtype_speakautograde\cloudpoodll\utils::fetch_options_skins(\qtype_speakautograde\cloudpoodll\constants::REC_AUDIO);
-        $mform->addElement('select', 'audioskin', get_string('audioskin', $plugin), $skinoptions);
-        $mform->setDefault('audioskin',$config->audioskin);
+        $name = 'audioskin';
+        $label = get_string($name, $plugin);
+        $type = \qtype_speakautograde\cloudpoodll\constants::REC_AUDIO;
+        $options = \qtype_speakautograde\cloudpoodll\utils::fetch_options_skins($type);
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault('audioskin', $config->$name);
 
         //videoskin
-        $skinoptions = \qtype_speakautograde\cloudpoodll\utils::fetch_options_skins(\qtype_speakautograde\cloudpoodll\constants::REC_VIDEO);
-        $mform->addElement('select', 'videoskin', get_string('videoskin', $plugin), $skinoptions);
-        $mform->setDefault('videoskin',$config->videoskin);
+        $name = 'videoskin';
+        $label = get_string($name, $plugin);
+        $type = \qtype_speakautograde\cloudpoodll\constants::REC_VIDEO;
+        $options = \qtype_speakautograde\cloudpoodll\utils::fetch_options_skins($type);
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault($name, $config->$name);
 
         //transcriber
-        $transcriberoptions = \qtype_speakautograde\cloudpoodll\utils::fetch_options_transcribers();
-        $mform->addElement('select', 'transcriber', get_string('transcriber', $plugin), $transcriberoptions);
-        $mform->setDefault('transcriber',$config->transcriber);
+        $name = 'transcriber';
+        $label = get_string($name, $plugin);
+        $options = \qtype_speakautograde\cloudpoodll\utils::fetch_options_transcribers();
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault($name, $config->$name);
 
         //transcode
-        $mform->addElement('advcheckbox', 'transcode', get_string('transcode', $plugin),
-            get_string('transcode_details', $plugin));
-        $mform->setDefault('transcode',$config->transcode);
+        $name = 'transcode';
+        $label = get_string($name, $plugin);
+        $text = get_string('transcode_details', $plugin);
+        $mform->insertElementBefore($mform->createElement('advcheckbox', $name, $label, $text), $before);
+        $mform->setDefault($name, $config->$name);
 
         //expiredays
-        $expiredaysoptions = \qtype_speakautograde\cloudpoodll\utils::get_expiredays_options();
-        $mform->addElement('select', 'expiredays', get_string('expiredays', $plugin), $expiredaysoptions);
-        $mform->setDefault('expiredays',$config->expiredays);
-
+        $name = 'expiredays';
+        $label = get_string($name, $plugin);
+        $options = \qtype_speakautograde\cloudpoodll\utils::get_expiredays_options();
+        $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
+        $mform->setDefault($name, $config->$name);
     }
 
     protected function data_preprocessing($question) {
@@ -116,11 +134,11 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         /*
         $question->timelimit = $question->options->timelimit;
         $question->language = $question->options->language;
+        $question->expiredays = $question->options->expiredays;
+        $question->transcode = $question->options->transcode;
+        $question->transcriber = $question->options->transcriber;
         $question->audioskin = $question->options->audioskin;
         $question->videoskin = $question->options->videoskin;
-        $question->transcriber = $question->options->transcriber;
-        $question->transcode = $question->options->transcode;
-        $question->expiredays = $question->options->expiredays;
         */
 
         return $question;
