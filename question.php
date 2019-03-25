@@ -43,6 +43,17 @@ require_once($CFG->dirroot.'/question/type/essayautograde/question.php');
 // class:     question_graded_automatically
 class qtype_speakautograde_question extends qtype_essayautograde_question {
 
+    /** @return the result of applying {@link format_text()} to the question text. */
+    public function format_questiontext($qa) {
+        $qtext = parent::format_questiontext($qa);
+        $template = question_utils::to_plain_text($this->responsetemplate,
+                                                  $this->responsetemplateformat,
+                                                  array('para' => false));
+        $params = array('class' => 'audiovideo_response_prompt');
+        $template = html_writer::tag('blockquote', $template, $params);
+        return $qtext.$template;
+    }
+
     public function update_current_response($response, $displayoptions=null) {
         //
         // update Poodll response here

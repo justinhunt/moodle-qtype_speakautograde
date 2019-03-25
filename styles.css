@@ -4,6 +4,21 @@
     class names.
 ***************************************************************************/
 
+.que.speakautograde .audiovideo_response_prompt {
+    background-color: #fffff0;
+    border:    1px solid #999;
+    border-radius:        6px;
+    margin:           6px 0px;
+    padding:         6px 12px;
+    max-width:          640px;
+}
+.que.speakautograde .audiovideo_response_prompt:empty {
+    display: none;
+}
+.que.speakautograde .audiovideo_response_prompt:not(:empty) {
+    display: block;
+}
+
 .que.speakautograde .hidesample,
 .que.speakautograde .showsample {
     font-size: 0.85em;
@@ -172,11 +187,12 @@ table.speakautograde.review .present {
     border-color:      #99ff66; /* gentle green */
     color:             #009900; /* dark green */
 }
+
 .qtype_speakautograde_recording_cont {
-    display: block;
-    margin: auto;
-    text-align: center;
-    width: 100%;
+    display:             block;
+    margin:               auto;
+    text-align:         center;
+    width:                100%;
     background-image: url([[pix:qtype_speakautograde|loader]]);
     background-repeat: no-repeat;
     background-position: center center;
@@ -184,7 +200,8 @@ table.speakautograde.review .present {
 
 .qtype_speakautograde_transcriptdiv {
     background-color: #dff4d8; /* light green */
-    border: solid 1px #CCCCCC;
-    padding: 5px;
-    max-width: 500px;
+    border:    solid 1px #ccc;
+    border-radius:        4px;
+    max-width:          640px;
+    padding:              5px;
 }

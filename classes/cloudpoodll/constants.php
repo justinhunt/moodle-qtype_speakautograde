@@ -27,47 +27,43 @@ namespace qtype_speakautograde\cloudpoodll;
 
 defined('MOODLE_INTERNAL') || die();
 
-class constants
-{
+class constants {
+    const M_COMPONENT='qtype_speakautograde';
 
+    const APPID='qtype_speakautograde';
 
-const M_COMPONENT='qtype_speakautograde';
+    const REC_AUDIO = 'audio';
+    const REC_VIDEO = 'video';
 
-const APPID='qtype_speakautograde';
+    const SKIN_PLAIN = 'standard';
+    const SKIN_BMR = 'bmr';
+    const SKIN_123 = 'onetwothree';
+    const SKIN_FRESH = 'fresh';
+    const SKIN_ONCE = 'once';
+    const SKIN_UPLOAD = 'upload';
 
-const REC_AUDIO = 'audio';
-const REC_VIDEO = 'video';
+    const FALLBACK_UPLOAD = 'upload';
+    const FALLBACK_IOSUPLOAD = 'iosupload';
+    const FALLBACK_WARNING = 'warning';
 
-const SKIN_PLAIN = 'standard';
-const SKIN_BMR = 'bmr';
-const SKIN_123 = 'onetwothree';
-const SKIN_FRESH = 'fresh';
-const SKIN_ONCE = 'once';
-const SKIN_UPLOAD = 'upload';
+    const TRANSCRIBER_CHROME = 'chrome';
+    const TRANSCRIBER_AMAZON_TRANSCRIBE = 'amazontranscribe';
 
-const FALLBACK_UPLOAD = 'upload';
-const FALLBACK_IOSUPLOAD = 'iosupload';
-const FALLBACK_WARNING = 'warning';
+    const CLASS_REC_CONTAINER ='speakautograde_cloudpoodll_rec_cont';
+    const CLASS_REC_OUTER ='speakautograde_cloudpoodll_rec_outer';
+    const ID_REC ='speakautograde_cloudpoodll_therecorder';
+    const ID_UPDATE_CONTROL ='speakautograde_cloudpoodll_updatecontrol';
+    const NAME_UPDATE_CONTROL ='filename';
 
-const TRANSCRIBER_CHROME = 'chrome';
-const TRANSCRIBER_AMAZON_TRANSCRIBE = 'amazontranscribe';
+    const REGION_USEAST1 = 'useast1';
+    const REGION_TOKYO = 'tokyo';
+    const REGION_DUBLIN = 'dublin';
+    const REGION_SYDNEY = 'sydney';
+    const REGION_OTTAWA = 'ottawa';
+    const REGION_SAOPAULO = 'saopaulo';
+    const REGION_FRANKFURT = 'frankfurt';
+    const REGION_LONDON = 'london';
 
-const CLASS_REC_CONTAINER ='speakautograde_cloudpoodll_rec_cont';
-const CLASS_REC_OUTER ='speakautograde_cloudpoodll_rec_outer';
-const ID_REC ='speakautograde_cloudpoodll_therecorder';
-const ID_UPDATE_CONTROL ='speakautograde_cloudpoodll_updatecontrol';
-const NAME_UPDATE_CONTROL ='filename';
-
-const REGION_USEAST1 = 'useast1';
-const REGION_TOKYO = 'tokyo';
-const REGION_DUBLIN = 'dublin';
-const REGION_SYDNEY = 'sydney';
-const REGION_OTTAWA = 'ottawa';
-const REGION_SAOPAULO = 'saopaulo';
-const REGION_FRANKFURT = 'frankfurt';
-const REGION_LONDON = 'london';
-
-const LOADER_URL ='/question/type/speakautograde/cloudpoodll/cloudpoodllloader.html';
-const REFRESH_URL = '/question/type/speakautograde/cloudpoodll/refreshtoken.php';
-
+    const LOADER_URL ='/question/type/speakautograde/cloudpoodll/cloudpoodllloader.html';
+    const REFRESH_URL = '/question/type/speakautograde/cloudpoodll/refreshtoken.php';
 }
