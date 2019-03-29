@@ -178,32 +178,36 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
         $recorder = $this->fetch_recorder($options, $question, $fieldname);
 
         // setup HIDDEN fields
-
+        $use_audiourl=$step->get_qt_var($name . 'audiourl');
+        if(!$use_audiourl){$use_audiourl = '';}
         $audiourl = html_writer::empty_tag(
             'input', array('type' => 'hidden',
-                'name' => $fieldname.'audiourl'));
+                'name' => $fieldname.'audiourl',
+                'value'=>$use_audiourl));
 
+        $use_answer=$step->get_qt_var($name);
+        if(!$use_answer){$use_answer = constants::BLANK;}
         $answer = html_writer::empty_tag(
             'input', array('type' => 'hidden',
             'name' => $fieldname,
-            'value'=>constants::BLANK));
+            'value'=>$use_answer));
 
         $format = html_writer::empty_tag(
             'input', array('type' => 'hidden',
                 'name' => $fieldname.'format',
                 'value' => FORMAT_PLAIN));
 
+
+        $use_transcript=$step->get_qt_var($name.'transcript');
+        if(!$use_transcript){$use_transcript = constants::BLANK;}
         $transcript = html_writer::empty_tag(
             'input', array('type' => 'hidden',
              'name' => $fieldname.'transcript',
-            'value'=>constants::BLANK));
+            'value'=>$use_transcript));
 
 
         // return recorder and associated hidden fields
         return $recorder.$transcript.$audiourl.$answer.$format;
-
-
-        //return $recorder.$audiourl.$answer.$format;
     }
 
     /**
