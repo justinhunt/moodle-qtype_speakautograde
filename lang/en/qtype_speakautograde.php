@@ -100,6 +100,8 @@ $string['transcriber'] = 'Transcriber';
 $string['transcriber_details'] = 'The transcription engine to use';
 $string['transcriber_amazontranscribe'] = 'Amazon Transcribe';
 $string['transcriber_chrome'] = 'Chrome Speech API';
+$string['transcriptnotready'] = 'Transcript not ready yet';
+$string['transcripttitle'] = 'Transcript';
 
 $string['notimelimit'] = 'No time limit';
 $string['xsecs'] = '{$a} seconds';

@@ -35,6 +35,24 @@ require_once($CFG->dirroot.'/question/type/essayautograde/questiontype.php');
  */
 class qtype_speakautograde extends qtype_essayautograde {
 
+    /** Answer types in question_answers record */
+    const ANSWER_TYPE_BAND    = 0;
+    const ANSWER_TYPE_PHRASE  = 1;
+
+    /** Item types */
+    const ITEM_TYPE_NONE = 0;
+    const ITEM_TYPE_CHARS = 1;
+    const ITEM_TYPE_WORDS = 2;
+    const ITEM_TYPE_SENTENCES = 3;
+    const ITEM_TYPE_PARAGRAPHS = 4;
+
+    /** Show/hide values */
+    const SHOW_NONE                  = 0;
+    const SHOW_STUDENTS_ONLY         = 1;
+    const SHOW_TEACHERS_ONLY         = 2;
+    const SHOW_TEACHERS_AND_STUDENTS = 3;
+
+
     public function extra_question_fields() {
         $fields = parent::extra_question_fields();
 

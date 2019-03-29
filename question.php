@@ -26,13 +26,17 @@
 // prevent direct access to this script
 defined('MOODLE_INTERNAL') || die();
 
+use qtype_speakautograde\cloudpoodll\constants;
+use qtype_speakautograde\cloudpoodll\utils;
+
+
 // require the parent class
 require_once($CFG->dirroot.'/question/type/essayautograde/question.php');
 
 /**
  * Represents an speakautograde question.
  *
- * We can use almost all the methods from the parent "qtype_speak_question" class.
+ * We can use almost all the methods from the parent "qtype_essay_question" class.
  * However, we override "make_behaviour" in case automatic grading is required.
  * Additionally, we implement the methods required for automatic grading.
  *
@@ -58,13 +62,28 @@ class qtype_speakautograde_question extends qtype_essayautograde_question {
         //
         // update Poodll response here
         //
-        if (!empty($response) && !empty($response['answeraudiourl'])) {
-            $this->save_current_response('answeraudiourl', $response['answeraudiourl']);
-        }
-        if (!empty($response) && !empty($response['answertranscript'])) {
-            $this->save_current_response('answertranscript', $response['answertranscript']);
-        }
+        if (!empty($response)){
 
+            if(!empty($response['answeraudiourl']) && $response['answeraudiourl']!= null) {
+                $this->save_current_response('answeraudiourl', $response['answeraudiourl']);
+
+                //if we transcribed the audio on amazon, we pick it up now and poke it into the answer field
+                //we do not save it as "current_response", because in parent::update_current_response it looks at
+                // $response and overwrites current_response for the "answer" field
+                if($this->transcriber == constants::TRANSCRIBER_AMAZON_TRANSCRIBE) {
+                    $answer = utils::fetch_transcript($response['answeraudiourl']);
+                    if ($answer) {
+                        $response['answer']=$answer;
+                    }else{
+                        $response['answer']='';
+                    }
+                }
+            }
+
+            if(!empty($response['answertranscript'])) {
+                $this->save_current_response('answertranscript', $response['answertranscript']);
+            }
+        }
         parent::update_current_response($response, $displayoptions);
 
     }
@@ -83,22 +102,5 @@ class qtype_speakautograde_question extends qtype_essayautograde_question {
 
         // The response is complete iff all of our requirements are met.
         return $hasaudio;
-    }
-
-    // register an adhoc task to pick up transcripts
-    public function register_fetch_transcript_task($audiourl, $qa){
-        $fetch_task = new \qtype_speakautograde\task\fetch_transcript_adhoc();
-        $fetch_task->set_component('qtype_speakautograde');
-
-        $customdata = new \stdClass();
-        $customdata->audiourl = $audiourl;
-        $customdata->qa = $qa;
-        $customdata->question = $this;
-        $customdata->taskcreationtime = time();
-
-        $fetch_task->set_custom_data($customdata);
-        // queue it
-        \core\task\manager::queue_adhoc_task($fetch_task);
-        return true;
     }
 }

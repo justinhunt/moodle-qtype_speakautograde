@@ -217,13 +217,6 @@ class utils
 
     }
 
-    //Fetch the plugin dn record for a submission id
-    //used when exporting data from privacy provider (at least)
-    public static function fetch_submission_data($submissionid){
-        global $DB;
-        return $DB->get_record(constants::M_TABLE,array('submission'=>$submissionid));
-    }
-
     //We need a Poodll token to make this happen
     public static function fetch_token($apiuser, $apisecret, $force=false)
     {
@@ -302,5 +295,33 @@ class utils
             return false;
         }
         return $transcript;
+    }
+    //vtt data becomes ready in its own time, fetch them here
+    public static function fetch_vtt($audiourl){
+        $url = $audiourl . '.vtt';
+        $vtt = self::curl_fetch($url);
+        if(strpos($vtt,"<Error><Code>AccessDenied</Code>")>0){
+            return false;
+        }
+        return $vtt;
+    }
+
+    // register an adhoc task to pick up transcripts
+    public static function register_fetch_transcript_task($audiourl, $qa, $oldstep){
+        $fetch_task = new \qtype_speakautograde\task\fetch_transcript_adhoc();
+        $fetch_task->set_component(constants::M_COMPONENT);
+
+        $customdata = new \stdClass();
+        $customdata->audiourl = $audiourl;
+        $customdata->qa = $qa;
+        $customdata->oldstep = $oldstep;
+        $customdata->taskcreationtime = time();
+
+        //$fetch_task->set_custom_data($customdata);
+        $fetch_task->set_custom_data_as_string(serialize($customdata));
+
+        // queue it
+        \core\task\manager::queue_adhoc_task($fetch_task);
+        return true;
     }
 }
