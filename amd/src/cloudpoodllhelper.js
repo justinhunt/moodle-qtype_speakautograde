@@ -11,6 +11,7 @@ define(["jquery", "core/log", "qtype_speakautograde/cloudpoodllloader"], functio
             this.component = opts["component"];
             this.dom_id = opts["dom_id"];
             this.inputname = opts["inputname"];
+            this.transcriber = opts["transcriber"];
 
             this.register_controls();
             this.register_events();
@@ -36,6 +37,11 @@ define(["jquery", "core/log", "qtype_speakautograde/cloudpoodllloader"], functio
                     case "awaitingprocessing":
                         if(that.uploadstate != "posted") {
                             that.controls.audiourl.val(evt.mediaurl);
+                            if(this.transcriber=='amazon'){
+                                that.controls.audiourl.val(evt.mediaurl);
+                                that.controls.transcript.val(evt.transcripturl);
+                                that.controls.answer.val(evt.transcripturl);
+                            }
                         }
                         that.uploadstate = "posted";
                         break;
@@ -58,17 +64,7 @@ define(["jquery", "core/log", "qtype_speakautograde/cloudpoodllloader"], functio
         },
 
         register_events: function(){
-            /*
-            var that = this;
-            this.controls.deletebutton.click(function(){
-                if(that.controls.updatecontrol){
-                    if(confirm(M.util.get_string("reallydeletesubmission", that.component))){
-                        that.controls.updatecontrol.val(-1);
-                        that.controls.currentcontainer.html("");
-                    }
-                }
-            });
-            */
+            //nothing here
         }
     };//end of return object
 });

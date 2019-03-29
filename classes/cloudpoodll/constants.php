@@ -48,6 +48,8 @@ class constants {
 
     const TRANSCRIBER_CHROME = 'chrome';
     const TRANSCRIBER_AMAZON_TRANSCRIBE = 'amazontranscribe';
+    const PROCESSING = 'processing';
+    const BLANK = 'empty';
 
     const CLASS_REC_CONTAINER ='speakautograde_cloudpoodll_rec_cont';
     const CLASS_REC_OUTER ='speakautograde_cloudpoodll_rec_outer';
