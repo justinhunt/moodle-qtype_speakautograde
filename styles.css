@@ -208,7 +208,8 @@ table.speakautograde.review .present {
 
 /* interactive transcript */
 .qtype_speakautograde_transcriptcontainer {
-    width: 610px;
+    max-width: 610px;
+    width: 100%;
     font-family: Arial, sans-serif;
     overflow-x: scroll;
     /* max-height: 298px; */
@@ -225,7 +226,7 @@ table.speakautograde.review .present {
     height: 25px;
 }
 .qtype_speakautograde_transcript-body {
-    width: 600px;
+    /* width: 600px; */
     overflow-y: scroll;
     background-color: #e7e7e7;
     max-height: 298px;
