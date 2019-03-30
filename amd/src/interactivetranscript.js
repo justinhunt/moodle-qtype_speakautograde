@@ -276,7 +276,7 @@ define(['jquery','core/log'], function($,log) {
             }
         },
 
-        scrollerProto: function() {
+        scrollerProto: function(config) {
 
             var initHandlers = function (el) {
                 var self = this;
@@ -374,8 +374,8 @@ define(['jquery','core/log'], function($,log) {
                     console.log(element);
                     console.log(parent);
 */
-                    //plugin not defined here.. how to get it?
-                    if (false && plugin.settings.scrollToCenter){
+                    //scroll to center if we must
+                    if (config.settings.scrollToCenter){
                         centerPosCorrection = Math.round(parent.clientHeight/2 - element.clientHeight/2);
                     }
                     // If the top of the line is above the top of the parent view, were scrolling up,
@@ -420,9 +420,8 @@ define(['jquery','core/log'], function($,log) {
             }
         },
 
-        scroller:  function(element) {
-            return Object.create(this.scrollerProto()).init(element);
-           //return this.scrollerProto.init(element);
+        scroller:  function(element,config) {
+            return Object.create(this.scrollerProto(config)).init(element);
         },
 
 
@@ -538,7 +537,7 @@ define(['jquery','core/log'], function($,log) {
                     body.innerHTML = '';
                     body.appendChild(fragment);
                     body.setAttribute('lang', track.language);
-                    body.scroll = that.scroller(body);
+                    body.scroll = that.scroller(body,config);
                     body.addEventListener('click', clickToSeekHandler);
                     thewidget.element.replaceChild(body, thewidget.body);
                     thewidget.body = body;
