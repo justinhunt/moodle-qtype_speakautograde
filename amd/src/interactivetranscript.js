@@ -277,7 +277,6 @@ define(['jquery','core/log'], function($,log) {
         },
 
         scrollerProto: function(config) {
-
             var initHandlers = function (el) {
                 var self = this;
                 // The scroll event. We want to keep track of when the user is scrolling the transcript.
@@ -424,7 +423,6 @@ define(['jquery','core/log'], function($,log) {
             return Object.create(this.scrollerProto(config)).init(element);
         },
 
-
         /*global config*/
         trackList: function(config) {
             var activeTrack;
@@ -457,7 +455,6 @@ define(['jquery','core/log'], function($,log) {
         },
 
         /*globals utils, eventEmitter,scrollable*/
-
         widget:  function(config) {
             var that = this;
             var thewidget = {};
