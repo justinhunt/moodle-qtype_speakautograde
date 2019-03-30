@@ -579,7 +579,7 @@ define(['jquery','core/log'], function($,log) {
                     if (time > begin && time < end) {
                         if (!line.classList.contains('is-active')) { // don't update if it hasn't changed
                             line.classList.add('is-active');
-                            if (config.settings.autoscroll && !(plugin.settings.stopScrollWhenInUse && thewidget.body.scroll.inUse())) {
+                            if (config.settings.autoscroll && !(config.settings.stopScrollWhenInUse && thewidget.body.scroll.inUse())) {
                                 thewidget.body.scroll.to(line);
                             }
                         }
