@@ -169,41 +169,52 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
         //utils::register_fetch_transcript_task($url,$qa,$step);
     }
 
-    public function response_area_input($name, $qa, $step, $lines, $context) {
+    public function response_area_input($name, $qa, $step, $lines, $context)
+    {
         $question = $qa->get_question();
         $fieldname = $qa->get_qt_field_name($name);
 
         // setup the recorder DIV
-        $options = get_config('qtype_speakautograde') ;
+        $options = get_config('qtype_speakautograde');
         $recorder = $this->fetch_recorder($options, $question, $fieldname);
 
         // setup HIDDEN fields
-
+        $use_audiourl = $step->get_qt_var($name . 'audiourl');
+        if (!$use_audiourl) {
+            $use_audiourl = '';
+        }
         $audiourl = html_writer::empty_tag(
             'input', array('type' => 'hidden',
-                'name' => $fieldname.'audiourl'));
+            'name' => $fieldname . 'audiourl',
+            'value' => $use_audiourl));
 
+        $use_answer = $step->get_qt_var($name);
+        if (!$use_answer) {
+            $use_answer = constants::BLANK;
+        }
         $answer = html_writer::empty_tag(
             'input', array('type' => 'hidden',
             'name' => $fieldname,
-            'value'=>constants::BLANK));
+            'value' => $use_answer));
+
 
         $format = html_writer::empty_tag(
             'input', array('type' => 'hidden',
-                'name' => $fieldname.'format',
-                'value' => FORMAT_PLAIN));
+            'name' => $fieldname . 'format',
+            'value' => FORMAT_PLAIN));
 
+        $use_transcript = $step->get_qt_var($name . 'transcript');
+        if (!$use_transcript) {
+            $use_transcript = constants::BLANK;
+        }
         $transcript = html_writer::empty_tag(
             'input', array('type' => 'hidden',
-             'name' => $fieldname.'transcript',
-            'value'=>constants::BLANK));
+            'name' => $fieldname . 'transcript',
+            'value' => $use_transcript));
 
 
         // return recorder and associated hidden fields
-        return $recorder.$transcript.$audiourl.$answer.$format;
-
-
-        //return $recorder.$audiourl.$answer.$format;
+        return $recorder . $transcript . $audiourl . $answer . $format;
     }
 
     /**
@@ -246,8 +257,8 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
             $PAGE->requires->js_call_amd(constants::M_COMPONENT . "/interactivetranscript", 'init', array($transcriptopts));
             $PAGE->requires->strings_for_js(array('transcripttitle'), constants::M_COMPONENT);
         }
-
         return $ret;
+
     }
 
 
