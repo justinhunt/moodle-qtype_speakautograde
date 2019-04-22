@@ -52,7 +52,33 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $config = get_config($plugin);
         $qtype = question_bank::get_qtype('speakautograde');
 
-        // replace response format with Poodll options (audio and video)
+        ////////////////////////////////////////////////
+        /// Hide Essay response options
+        /////////////////////////////////////////////////
+
+        // The name of the element before which we want to insert all the response options
+        $before = 'responsetemplateheader';
+
+        // The following fields do not really apply to Speak auto-grade questions,
+        // so we replace them with hidden fields with a reasonable default value.
+        $values = array('responserequired'    => 1,
+                        'responsefieldlines'  => 5,
+                        'attachments'         => 0,
+                        'attachmentsrequired' => 0,
+                        'filetypeslist'       => '');
+        foreach ($values as $name => $value) {
+            if ($mform->elementExists($name)) {
+                $mform->removeElement($name);
+            }
+            $mform->insertElementBefore($mform->createElement('hidden', $name, $value), $before);
+            if (is_string($value)) {
+                $mform->setType($name, PARAM_TEXT);
+            } else {
+                $mform->setType($name, PARAM_INT);
+            }
+        }
+
+        // Replace the response format with Poodll options (audio and video)
         $name = 'responseformat';
         if ($mform->elementExists($name)) {
             $mform->removeElement($name, false);
@@ -60,7 +86,7 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $label = get_string($name, 'qtype_essay');
         $options = $qtype->response_formats();
         $element = $mform->createElement('select', $name, $label, $options);
-        $mform->insertElementBefore($element, 'responsetemplateheader');
+        $mform->insertElementBefore($element, $before);
         $mform->setDefault($name, key($options));
 
         ////////////////////////////////////////////////
