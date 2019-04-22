@@ -129,48 +129,50 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
 
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         $question = $qa->get_question();
-        // this fetches submitted
+
+        // fetch submitted data
         $audiourl = $step->get_qt_var($name.'audiourl');
         $transcript = $step->get_qt_var($name.'transcript');
-        //have subtitles
-        $have_subtitles= false;
 
-        //if amazon transcribe we have subtitles, and would like to process grades again since transcripts arrive async
-        if($question->transcriber == constants::TRANSCRIBER_AMAZON_TRANSCRIBE){
+        // assume no subtitles
+        $have_subtitles = false;
+
+        // if Amazon transcribe we have subtitles, and would like to process grades again since transcripts arrive async
+        if ($question->transcriber == constants::TRANSCRIBER_AMAZON_TRANSCRIBE) {
             $transcript = utils::fetch_transcript($audiourl);
-            if($transcript){
+            if ($transcript) {
                 $have_subtitles = true;
-                //We need a place to do this,
+                // We need a place to do this,
                 // this would force a regrade if a transcript had arrived recently
                 // but it doesn't work here .. we get "question already started errors"
                 $transcriptprocessed = $qa->get_metadata('transcriptprocessed');
-                if(!$transcriptprocessed){
+                if (!$transcriptprocessed) {
                     $qa->set_metadata('transcriptprocessed',true);
                     //$qa->regrade($qa,false);
                 }
             }
         }
 
-        //transcript could be a url , or a block of text or empty
-        //here we turn a url into text if we can
-        if(!$transcript || empty($transcript)){
-           $transcript = get_string('transcriptnotready',CONSTANTS::M_COMPONENT);
-           $have_subtitles = false;
+        // transcript could be a url, or a block of text or empty
+        // here we turn a url into text if we can
+        if (empty($transcript)) {
+            $transcript = get_string('transcriptnotready', CONSTANTS::M_COMPONENT);
+            $have_subtitles = false;
         }
-       $transcript_div= html_writer::div($transcript, 'qtype_speakautograde_transcriptdiv', array());
-       $player_div = $this->fetch_player($audiourl,$question->language,$have_subtitles);
 
-       $ret = $player_div;
-       if(!$have_subtitles){$ret .= $transcript_div;}
+        $player_div = $this->fetch_player($audiourl, $question->language, $have_subtitles);
 
-        return $ret;
+        if ($have_subtitles) {
+            return $player_div;
+        } else {
+            return $player_div.html_writer::div($transcript, 'qtype_speakautograde_transcriptdiv', array());
+        }
 
-        //do this for testing fetch and process of transcript via ad hoc task.
+        // do this for testing fetch and process of transcript via ad hoc task.
         //utils::register_fetch_transcript_task($url,$qa,$step);
     }
 
-    public function response_area_input($name, $qa, $step, $lines, $context)
-    {
+    public function response_area_input($name, $qa, $step, $lines, $context) {
         $question = $qa->get_question();
         $fieldname = $qa->get_qt_field_name($name);
 
@@ -179,29 +181,27 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
         $recorder = $this->fetch_recorder($options, $question, $fieldname);
 
         // setup HIDDEN fields
-        $current_audiourl = $step->get_last_qt_var($name . 'audiourl');
-        $audiourl = html_writer::empty_tag(
-            'input', array('type' => 'hidden',
-            'name' => $fieldname . 'audiourl',
-            'value' => $current_audiourl));
-
-        $current_answer = $step->get_last_qt_var($name);
-        $answer = html_writer::empty_tag(
-            'input', array('type' => 'hidden',
-            'name' => $fieldname,
-            'value' => $current_answer));
-
-
-        $format = html_writer::empty_tag(
-            'input', array('type' => 'hidden',
-            'name' => $fieldname . 'format',
-            'value' => FORMAT_PLAIN));
-
-        $current_transcript = $step->get_last_qt_var($name . 'transcript');
-        $transcript = html_writer::empty_tag(
-            'input', array('type' => 'hidden',
-            'name' => $fieldname . 'transcript',
-            'value' => $current_transcript));
+        if (! $use_audiourl = $step->get_qt_var($name.'audiourl')) {
+            $use_audiourl = '';
+        }
+        $audiourl = html_writer::empty_tag('input', array('type' => 'hidden',
+                                                          'name' => $fieldname.'audiourl',
+                                                          'value' => $use_audiourl));
+        if (! $use_answer = $step->get_qt_var($name)) {
+            $use_answer = constants::BLANK;
+        }
+        $answer = html_writer::empty_tag('input', array('type' => 'hidden',
+                                                        'name' => $fieldname,
+                                                        'value' => $use_answer));
+        $format = html_writer::empty_tag('input', array('type' => 'hidden',
+                                                        'name' => $fieldname.'format',
+                                                        'value' => FORMAT_PLAIN));
+        if (! $use_transcript = $step->get_qt_var($name.'transcript')) {
+            $use_transcript = constants::BLANK;
+        }
+        $transcript = html_writer::empty_tag('input', array('type' => 'hidden',
+                                                            'name' => $fieldname.'transcript',
+                                                            'value' => $use_transcript));
 
 
         // return recorder and associated hidden fields
@@ -211,44 +211,49 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
     /**
      * @return string the HTML for the textarea.
      */
-    protected function fetch_player($mediaurl,$language, $havesubtitles=false) {
+    protected function fetch_player($mediaurl, $language, $havesubtitles=false) {
         global $PAGE;
 
-        $playerid= html_writer::random_id(constants::M_COMPONENT . '_');
+        $playerid = html_writer::random_id(constants::M_COMPONENT.'_');
 
-        //audio player template
-        $audioplayer = "<audio id='@PLAYERID@' crossorigin='anonymous' controls='true'>";
-        $audioplayer .= "<source src='@MEDIAURL@'>";
-        if($havesubtitles){$audioplayer .= "<track src='@VTTURL@' kind='captions' srclang='@LANG@' label='@LANG@' default='true'>";}
-        $audioplayer .= "</audio>";
+        // define player template
+        if ($this->class_name() == 'qtype_speakautograde_video') {
+            // video player
+            $player = "<video id='@PLAYERID@' crossorigin='anonymous' controls='true'><source src='@MEDIAURL@'>";
+            if($havesubtitles){
+                $player .= "<track src='@VTTURL@' kind='captions' srclang='@LANG@' label='@LANG@' default='true'>";
+            }
+            $player .= '</video>';
+        } else {
+            // audio player
+            $player = "<audio id='@PLAYERID@' crossorigin='anonymous' controls='true'><source src='@MEDIAURL@'>";
+            if($havesubtitles){
+                $player .= "<track src='@VTTURL@' kind='captions' srclang='@LANG@' label='@LANG@' default='true'>";
+            }
+            $player .= '</audio>';
+        }
 
-        //video player template
-        $videoplayer = "<video id='@PLAYERID@' crossorigin='anonymous' controls='true'>";
-        $videoplayer .= "<source src='@MEDIAURL@'>";
-        if($havesubtitles){$videoplayer .= "<track src='@VTTURL@' kind='captions' srclang='@LANG@' label='@LANG@' default='true'>";}
-        $videoplayer .= "</video>";
+        $player = str_replace('@PLAYERID@', $playerid, $player);
+        $player = str_replace('@MEDIAURL@', $mediaurl, $player);
+        $player = str_replace('@LANG@', $language, $player);
+        $player = str_replace('@VTTURL@', $mediaurl.'.vtt',$player);
 
-        //template -> player
-        $theplayer = ($this->class_name() == 'qtype_speakautograde_video' ? $videoplayer : $audioplayer);
-        $theplayer =str_replace('@PLAYERID@',$playerid,$theplayer);
-        $theplayer =str_replace('@MEDIAURL@',$mediaurl,$theplayer);
-        $theplayer =str_replace('@LANG@',$language,$theplayer);
-        $theplayer =str_replace('@VTTURL@',$mediaurl . '.vtt',$theplayer);
-
-        $ret = $theplayer;
-
-        //if we have subtitles add the transcript AMD and html
+        // if we have subtitles add the transcript AMD and html
         if($havesubtitles) {
-            $transcript_containerid= html_writer::random_id(constants::M_COMPONENT . '_');
-            $transcript_container = html_writer::div('',constants::M_COMPONENT . '_transcriptcontainer',array('id'=>$transcript_containerid));
-            $ret  .= $transcript_container;
+            $transcript_containerid = html_writer::random_id(constants::M_COMPONENT.'_');
+            $transcript_container = html_writer::div('', constants::M_COMPONENT.'_transcriptcontainer', array('id' => $transcript_containerid));
+            $player .= $transcript_container;
 
-            //prepare AMD javascript for displaying transcript
-            $transcriptopts = array('component' => constants::M_COMPONENT, 'playerid' => $playerid, 'containerid' => $transcript_containerid, 'cssprefix' => constants::M_COMPONENT . '_transcript');
-            $PAGE->requires->js_call_amd(constants::M_COMPONENT . "/interactivetranscript", 'init', array($transcriptopts));
+            // prepare AMD javascript for displaying transcript
+            $opts = array('component' => constants::M_COMPONENT,
+                          'playerid' => $playerid,
+                          'containerid' => $transcript_containerid,
+                          'cssprefix' => constants::M_COMPONENT.'_transcript');
+            $PAGE->requires->js_call_amd(constants::M_COMPONENT.'/interactivetranscript', 'init', array($opts));
             $PAGE->requires->strings_for_js(array('transcripttitle'), constants::M_COMPONENT);
         }
-        return $ret;
+
+        return $player;
 
     }
 
@@ -277,7 +282,7 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
                         $height = '190';
                         break;
                     default:
-                        // bmr 123 once standard
+                        // bmr 123, once, standard
                         $width = '360';
                         $height = '240';
                 }
@@ -379,7 +384,7 @@ class qtype_speakautograde_format_base_renderer extends plugin_renderer_base{
             'component' => constants::M_COMPONENT,
             'dom_id' => $dom_id,
             'inputname' => $inputname,
-            'transcriber'=>$transcriber
+            'transcriber' => $transcriber
         );
 
         $this->page->requires->js_call_amd(constants::M_COMPONENT.'/cloudpoodllhelper', 'init', array($opts));

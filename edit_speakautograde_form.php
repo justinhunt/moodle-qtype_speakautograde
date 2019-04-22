@@ -52,7 +52,36 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $config = get_config($plugin);
         $qtype = question_bank::get_qtype('speakautograde');
 
-        // replace response format with Poodll options (audio and video)
+        ////////////////////////////////////////////////
+        /// Hide Essay response options
+        /////////////////////////////////////////////////
+
+        // The name of the element before which we want to insert all the options
+        $before = 'responsetemplateheader';
+
+        // The following fields do not really apply to Speak auto-grade questions,
+        // so we replace them with hidden fields with a reasonable default value.
+        $values = array('responserequired'    => 1,
+                        'responsefieldlines'  => 5,
+                        'attachments'         => 0,
+                        'attachmentsrequired' => 0,
+                        'filetypeslist'       => '');
+        foreach ($values as $name => $value) {
+            if ($mform->elementExists($name)) {
+                $mform->removeElement($name);
+            }
+            $mform->insertElementBefore($mform->createElement('hidden', $name, $value), $before);
+            if (is_string($value)) {
+                $mform->setType($name, PARAM_TEXT);
+            } else {
+                $mform->setType($name, PARAM_INT);
+            }
+        }
+
+        ////////////////////////////////////////////////
+        // Replace response format with Poodll options
+        ////////////////////////////////////////////////
+
         $name = 'responseformat';
         if ($mform->elementExists($name)) {
             $mform->removeElement($name, false);
@@ -60,36 +89,28 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $label = get_string($name, 'qtype_essay');
         $options = $qtype->response_formats();
         $element = $mform->createElement('select', $name, $label, $options);
-        $mform->insertElementBefore($element, 'responsetemplateheader');
+        $mform->insertElementBefore($element, $before);
         $mform->setDefault($name, key($options));
 
         ////////////////////////////////////////////////
-        /// CLOUD POODLL API
+        /// Add settings for Cloud Poodll media player
         /////////////////////////////////////////////////
 
-        // the name of the element before which we want to insert all the recording options
-        $before = 'multitriesheader';
-
-        $name = 'recordingheader';
-        $label = get_string($name, $plugin);
-        $mform->insertElementBefore($mform->createElement('header', $name, $label), $before);
-        $mform->setExpanded($name, true);
-
-        //timelimit
+        // timelimit
         $name = 'timelimit';
         $label = get_string($name, $plugin);
         $options = \qtype_speakautograde\cloudpoodll\utils::get_timelimit_options();
         $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
         $mform->setDefault($name, 60);
 
-        //language options
+        // language options
         $name = 'language';
         $label = get_string($name, $plugin);
         $options = \qtype_speakautograde\cloudpoodll\utils::get_lang_options();
         $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
         $mform->setDefault($name, $config->$name);
 
-        //audioskin
+        // audioskin
         $name = 'audioskin';
         $label = get_string($name, $plugin);
         $type = \qtype_speakautograde\cloudpoodll\constants::REC_AUDIO;
@@ -97,7 +118,7 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
         $mform->setDefault('audioskin', $config->$name);
 
-        //videoskin
+        // videoskin
         $name = 'videoskin';
         $label = get_string($name, $plugin);
         $type = \qtype_speakautograde\cloudpoodll\constants::REC_VIDEO;
@@ -105,21 +126,21 @@ class qtype_speakautograde_edit_form extends qtype_essayautograde_edit_form {
         $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
         $mform->setDefault($name, $config->$name);
 
-        //transcriber
+        // transcriber
         $name = 'transcriber';
         $label = get_string($name, $plugin);
         $options = \qtype_speakautograde\cloudpoodll\utils::fetch_options_transcribers();
         $mform->insertElementBefore($mform->createElement('select', $name, $label, $options), $before);
         $mform->setDefault($name, $config->$name);
 
-        //transcode
+        // transcode
         $name = 'transcode';
         $label = get_string($name, $plugin);
         $text = get_string('transcode_details', $plugin);
         $mform->insertElementBefore($mform->createElement('advcheckbox', $name, $label, $text), $before);
         $mform->setDefault($name, $config->$name);
 
-        //expiredays
+        // expiredays
         $name = 'expiredays';
         $label = get_string($name, $plugin);
         $options = \qtype_speakautograde\cloudpoodll\utils::get_expiredays_options();
