@@ -109,5 +109,3 @@ $string['onemin'] = '1 minute';
 $string['xmins'] = '{$a} minutes';
 $string['oneminxsecs'] = '1 minutes {$a} seconds';
 $string['xminsecs'] = '{$a->minutes} minutes {$a->seconds} seconds';
-
-$string['recordingheader'] = 'Recording options';
