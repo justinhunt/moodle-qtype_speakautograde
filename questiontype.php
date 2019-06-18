@@ -127,12 +127,12 @@ class qtype_speakautograde extends qtype_essayautograde {
         $values = parent::get_default_values($questionid, $feedback);
         $values = array_merge($values, array(
             'timelimit'   =>  0,
-            'language'    => '',
-            'expiredays'  =>  0,
-            'transcode'   =>  0,
-            'transcriber' => '',
-            'audioskin'   => '',
-            'videoskin'   => ''
+            'language'    => 'none',
+            'expiredays'  =>  365,
+            'transcode'   =>  1,
+            'transcriber' => 'chrome',
+            'audioskin'   => 'onetwothree',
+            'videoskin'   => 'onetwothree'
         ));
         return $values;
     }
